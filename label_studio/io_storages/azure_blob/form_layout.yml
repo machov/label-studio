@@ -1,8 +1,15 @@
-# 1x3 grid
-title_container_prefix: &title_container_prefix
+# 1x1 grid
+title: &title
   - type: text
     name: title
-    label: Storage Title
+    label: Integration Name
+
+# 1x3 grid
+storage_params: &storage_params
+  - type: text
+    name: account_name
+    label: Storage Name
+    placeholder: <storage name> (not url)
   - type: text
     name: container
     label: Container Name
@@ -11,28 +18,36 @@ title_container_prefix: &title_container_prefix
     name: prefix
     label: Container Prefix
 
-# 1x3 grid
-azure_params: &azure_params
-  - type: password
-    name: account_name
-    label: Account Name
-    autoComplete: "off"
-    skipAutofill: true
+# 1x2 grid
+authentication_params: &authentication_params
+  - type: text
+    name: tenant_id
+    label: Tenant ID
+    placeholder: SPI Tenant ID
     allowEmpty: false
-    protectedValue: true
+  - type: text
+    name: client_id
+    label: Client ID
+    placeholder: SPI Client ID
+    allowEmpty: false
+# 1x1 grid
+authentication_pwd: &authentication_pwd
   - type: password
-    name: account_key
-    label: Account Key
+    name: client_secret
+    label: Client Secret
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
     protectedValue: true
-  - null
 
 ImportStorage:
   # Title, Bucket, Prefix
+  - columnCount: 1
+    fields: *title
+  # Bucket
   - columnCount: 3
-    fields: *title_container_prefix
+    fields: *storage_params
+
   # Regex filter
   - columnCount: 1
     fields:
@@ -42,10 +57,11 @@ ImportStorage:
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
         validators:
           - regexp
-  # AWS specific params
-  - columnCount: 3
-    fields: *azure_params
-
+  # Azure Auth params
+  - columnCount: 2
+    fields: *authentication_params
+  - columnCount: 1
+    fields: *authentication_pwd
   # 2 columns grid
   - columnCount: 2
     columns:
@@ -53,8 +69,8 @@ ImportStorage:
         fields:
           - type: toggle
             name: use_blob_urls
-            label: Treat every bucket object as a source file
-            description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+            label: Treat every items object as an image/src file
+            description: If unchecked, treat every item object as a JSON-formatted task. Optional
       - fields:
           - type: toggle
             name: presign
@@ -68,7 +84,14 @@ ImportStorage:
             dependency: presign
 
 ExportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 1
+    fields: *title
+  # Bucket
   - columnCount: 3
-    fields: *title_container_prefix
+    fields: *storage_params
+  # Azure Auth params
   - columnCount: 2
-    fields: *azure_params
+    fields: *authentication_params
+  - columnCount: 1
+    fields: *authentication_pwd
