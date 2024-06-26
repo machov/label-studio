@@ -366,7 +366,6 @@ stages:
     json:
       last_sync_count: 3
     status_code: 200
-
 ---
 test_name: test_import_from_gcs_storage
 strict: false
@@ -1319,6 +1318,15 @@ stages:
     status_code: 200
 - name: stage
   request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azurespi-images/.+"
+    status_code: 200
+- name: stage
+  request:
     data:
       project: '{project_pk}'
     method: GET
@@ -1886,3 +1894,4 @@ stages:
     json:
       last_sync_count: 0
     status_code: 200
+# xxxxx
